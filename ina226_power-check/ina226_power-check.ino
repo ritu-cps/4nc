@@ -13,8 +13,9 @@ use
 #include "libraries/ina226.h"
 #include <Wire.h>
 
+// power-suply1 is LowPower : power-suply2 is HighPower
 #define relay1 1  // before power-suply1
-#define reley2 2  // after power-suply1
+#define relay2 2  // after power-suply1
 #define relay3 3  // before power-suply2
 #define relay4 4  // after power-suply2
 
@@ -162,20 +163,20 @@ void setup(){
 
   // setup power list
   power = 0;
-  MA_power();
+  //MA_power();
   for (int i = 0; i < 10; i++){
     measure_power();
-    power_list[i] = power;
-    power_sum = power_sum + power;
+    MA_power();
   }
 }
 
 void loop(){
   measure_power();
   MA_power();
-  if (power > threshold_power){
-    mode_change(喜島喜島喜島喜島);モードチェンジについて考える
-  }
+  if (powersupply_mode == true)
+    if (power > threshold_power) mode_change(powersupply_mode);
+  else
+    if (power < threshold_power) mode_change(powersupply_mode);
 
 
   delay(500);
