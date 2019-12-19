@@ -14,10 +14,10 @@ use
 #include <Wire.h>
 
 // power-suply1 is LowPower : power-suply2 is HighPower
-#define relay1 1  // before power-suply1
-#define relay2 2  // after power-suply1
-#define relay3 3  // before power-suply2
-#define relay4 4  // after power-suply2
+#define relay1 6  // before power-suply1
+#define relay2 8  // after power-suply1
+#define relay3 7  // before power-suply2
+#define relay4 9  // after power-suply2
 
 const int threshold_power = 200;  // 電源を切り替える際の消費電力の閾値
 static boolean powersupply_mode = true;  // 現在稼働している電源の確認用フラグ(true:power-suply1 on, false:power-suply2 on)
@@ -29,6 +29,7 @@ long  voltage;   // Bus Voltage (mV)
 short current;   // Current (mA)
 long  power;     // Power (uW)
 
+//ina226 start
 static void writeRegister(byte reg, word value)
 {
   Wire.beginTransmission(INA226_ADDR);
@@ -101,16 +102,18 @@ static void dumpRegisters(void){
     Serial.println(buf);
   }
 }
-
+//ina226 end
 
 void print_measure_power(){ // serialprint measured power
   char  buf[64];
   snprintf(buf, NELEMS(buf)
-    , "V:\t%5ld\tmV, I:\t%5d\tmA, P:\t%5ld\tmW"
+    , "\tV:\t%5ld\tmV, I:\t%5d\tmA, P:\t%5ld\tmW"
     , (voltage + (1000/2)) / 1000
     , current
     , (power + (1000/2)) / 1000
     );
+  if (powersupply_mode) Serial.print("1");
+  else Serial.print("2");
   Serial.println(buf);
 }
 
@@ -178,6 +181,7 @@ void loop(){
   else
     if (power < threshold_power) mode_change(powersupply_mode);
 
+  print_measure_power();
 
   delay(500);
 }
